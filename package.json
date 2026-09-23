@@ -1,0 +1,8 @@
+{
+  "name": "ai-shikshak",
+  "version": "1.0.0",
+  "description": "AI Teaching Video Generator",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
