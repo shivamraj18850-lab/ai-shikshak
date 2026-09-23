@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Shikshak - Smart Teaching Video Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Poppins', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="bg-indigo-600 text-white p-2 rounded-xl text-xl font-bold">🎓 AI</span>
+                <h1 class="text-xl font-bold tracking-wide">AI Shikshak <span class="text-indigo-400 text-sm font-normal">| Live Generator</span></h1>
+            </div>
+            <span class="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">Backend Connected</span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-indigo-300">📝 Script & Settings</h2>
+                    <button onclick="loadSampleScript()" class="text-xs bg-slate-700 hover:bg-slate-600 text-indigo-300 px-3 py-1.5 rounded-lg transition border border-slate-600">
+                        Load Sample
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Topic Name</label>
+                        <input type="text" id="topicInput" placeholder="Jaise: कोशिका : जीवन की इकाई" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Video Part</label>
+                        <select id="partSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <option value="Part 1">Part 1</option>
+                            <option value="Part 2">Part 2</option>
+                            <option value="Part 3">Part 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Teaching Script</label>
+                    <textarea id="scriptInput" rows="12" placeholder="Yahan lamba teaching script paste karein..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-slate-100 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                </div>
+            </div>
+
+            <button onclick="generateVideo()" id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2">
+                <span>🚀 Generate AI Video</span>
+            </button>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
+            <h2 class="text-lg font-semibold text-indigo-300 mb-4">📺 Render Screen</h2>
+            
+            <div id="videoContainer" class="w-full h-80 bg-slate-900 rounded-xl border border-slate-700 flex flex-col items-center justify-center relative overflow-hidden text-center p-6">
+                <div id="placeholderState" class="space-y-3">
+                    <div class="text-4xl">🎬</div>
+                    <p class="text-slate-400 text-sm">Script daalkar 'Generate' button dabayein.</p>
+                </div>
+
+                <div id="loadingState" class="hidden space-y-4 w-full max-w-xs">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
+                    <p class="text-sm text-indigo-300 font-medium animate-pulse">Rendering Video via Serverless API...</p>
+                </div>
+
+                <div id="successState" class="hidden w-full h-full flex flex-col justify-between items-center">
+                    <div class="w-full bg-black rounded-lg h-52 flex items-center justify-center relative border border-slate-700">
+                        <video id="resultVideo" controls class="w-full h-full rounded-lg object-cover"></video>
+                    </div>
+                    <div class="w-full flex space-x-3 mt-4">
+                        <a id="downloadLink" href="#" download="ai-teacher-video.mp4" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl transition text-sm text-center">
+                            📥 Download MP4
+                        </a>
+                        <button onclick="resetApp()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2.5 rounded-xl transition text-sm">
+                            Next Part
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-slate-700/60 pt-4 text-xs text-slate-400">
+                <p>💡 Serverless Netlify function aapki API key ko chhipa kar rakhta hai.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function loadSampleScript() {
+            document.getElementById('topicInput').value = "कोशिका : जीवन की इकाई";
+            document.getElementById('scriptInput').value = "नमस्ते बच्चों! आज हम कक्षा 11 की जीव विज्ञान की इस क्लास में कोशिका के बारे में विस्तार से पढ़ेंगे...";
+        }
+
+        async function generateVideo() {
+            const topic = document.getElementById('topicInput').value.trim();
+            const script = document.getElementById('scriptInput').value.trim();
+            const part = document.getElementById('partSelect').value;
+
+            if (!topic || !script) {
+                alert('Kripya Topic aur Script dono bharein!');
+                return;
+            }
+
+            document.getElementById('placeholderState').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('generateBtn').disabled = true;
+
+            try {
+                const response = await fetch('/.netlify/functions/generate-video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, script, part })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.videoUrl) {
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('successState').classList.remove('hidden');
+                    document.getElementById('generateBtn').disabled = false;
+                    
+                    document.getElementById('resultVideo').src = result.videoUrl;
+                    document.getElementById('downloadLink').href = result.videoUrl;
+                } else {
+                    throw new Error(result.error || 'Video generation failed');
+                }
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+                resetApp();
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('successState').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('placeholderState').classList.remove('hidden');
+            document.getElementById('scriptInput').value = '';
+            document.getElementById('generateBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>
